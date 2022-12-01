@@ -1,0 +1,153 @@
+#define F_Sonar 8
+#define R_Sonar 10
+#define L_Sonar 11 //고정 상수 
+
+int L_1 = 3;
+int L_2 = 2;
+int R_1 = 7;
+int R_2 = 4;
+int L_en = 5;
+int R_en = 6;
+
+float F_SonarD, R_SonarD, L_SonarD; //distance 
+
+float F_Sonar_sensor()
+{
+  float duration = 0.0;
+  float distance = 0.0;
+  pinMode(F_Sonar, OUTPUT);
+  digitalWrite(F_Sonar, LOW);
+  digitalWrite(F_Sonar, HIGH);
+  delay(10);
+  digitalWrite(F_Sonar, LOW);  
+  pinMode(F_Sonar, INPUT);  
+  duration = pulseIn(F_Sonar, HIGH);  
+  distance = (duration * 340.0)/2.0/1000.0;
+  return distance;
+}
+
+float  R_Sonar_sensor()
+{
+  float duration = 0.0;
+  float distance = 0.0;
+  pinMode(R_Sonar, OUTPUT);
+  digitalWrite(R_Sonar, LOW);
+  digitalWrite(R_Sonar, HIGH);
+  delay(10);
+  digitalWrite(R_Sonar, LOW);  
+  pinMode(R_Sonar, INPUT);  
+  duration = pulseIn(R_Sonar, HIGH);  
+  distance = (duration * 340.0)/2.0/1000.0;
+  return distance;
+}
+
+float  L_Sonar_sensor()
+{
+  float duration = 0.0;
+  float distance = 0.0;
+  pinMode(L_Sonar, OUTPUT);
+  digitalWrite(L_Sonar, LOW);
+  digitalWrite(L_Sonar, HIGH);
+  delay(10);
+  digitalWrite(L_Sonar, LOW);  
+  pinMode(L_Sonar, INPUT);  
+  duration = pulseIn(L_Sonar, HIGH);  
+  distance = (duration * 340.0)/2.0/1000.0;
+  return distance;
+}
+
+
+
+void front(int t){
+ //Go: 핀 3, 핀 4 에 신호를 다르게 하면 전진
+  digitalWrite(L_1, HIGH);
+  digitalWrite(L_2, LOW);
+  digitalWrite(R_1, HIGH);
+  digitalWrite(R_2, LOW);
+  delay(t); //5sec
+}
+void back (int t){
+//Back : 핀 3, 핀 4에 신호를 다르게 하면 후진 /
+  digitalWrite(L_1, LOW);
+  digitalWrite(L_2, HIGH);
+  digitalWrite(R_1, LOW);
+  digitalWrite(R_2, HIGH);
+  delay(t); //5sec
+}
+void right (int t, int c, int p){
+//Brake (Stop) 핀 3, 4에 똑같이 HIGH를 주거나 LOW을 주면 멈춘다.
+  digitalWrite(L_1, HIGH);
+  digitalWrite(L_2, LOW);
+  digitalWrite(R_2, HIGH);
+  digitalWrite(R_1, LOW);
+  analogWrite(L_en, c);
+  analogWrite(R_en, p);
+  delay(t); //5sec
+}
+
+void left (int t, int c, int p){
+  digitalWrite(L_2, HIGH);
+  digitalWrite(L_1, LOW);
+  digitalWrite(R_1, HIGH);
+  digitalWrite(R_2, LOW);
+  analogWrite(L_en, c);
+  analogWrite(R_en, p);
+  delay(t); //
+  }
+
+void Stop (int t){
+  digitalWrite(L_1, LOW);
+  digitalWrite(L_2, LOW);
+  digitalWrite(R_1, LOW);
+  digitalWrite(R_2, LOW);
+  delay(t); //5sec
+ 
+}
+
+void setup()
+{
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(F_Sonar, OUTPUT);
+  pinMode(R_Sonar, OUTPUT);
+  pinMode(L_Sonar, OUTPUT);
+  Serial.begin(115200);
+  pinMode(L_1, OUTPUT);
+  pinMode(L_2, OUTPUT); //3, 4번 제어핀들은 핀모드를 출력으로 설정  
+  pinMode(R_1, OUTPUT);
+  pinMode(R_2, OUTPUT);  
+  analogWrite(L_en, 120);
+  analogWrite(R_en, 150);
+ 
+}
+
+void loop(){
+  F_SonarD = F_Sonar_sensor();
+  R_SonarD = R_Sonar_sensor();
+  L_SonarD = L_Sonar_sensor();
+
+  if(F_SonarD <= 170){
+   Stop(1000);
+    if(R_SonarD < L_SonarD){
+      Stop(1000);
+      left(610,150,80);
+      Stop(1000);
+    }
+    else{
+    Stop(1000);
+    right(610,150,80);
+    Stop(1000);
+    }
+  }
+  else {
+    analogWrite(L_en, 120);
+    analogWrite(R_en, 150);
+
+    
+    digitalWrite(L_1 ,HIGH);
+    digitalWrite(L_2 ,LOW);
+
+    digitalWrite(R_1 ,HIGH);
+    digitalWrite(R_2 ,LOW);
+    
+  }
+}
